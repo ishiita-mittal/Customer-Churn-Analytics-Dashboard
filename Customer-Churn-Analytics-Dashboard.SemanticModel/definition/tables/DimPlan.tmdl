@@ -1,0 +1,41 @@
+table DimPlan
+	lineageTag: ee115b62-1424-4f69-ac43-027f244055f7
+
+	column PlanID
+		dataType: string
+		lineageTag: f24a1f58-b051-40e9-b7b4-ccb87add388f
+		summarizeBy: none
+		sourceColumn: PlanID
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlanName
+		dataType: string
+		lineageTag: 1e853751-7889-4124-a7a0-d3a5e8307c83
+		summarizeBy: none
+		sourceColumn: PlanName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthlyPrice
+		dataType: int64
+		formatString: 0
+		lineageTag: 8a64a73a-0b5e-46bd-9592-79b6813e2b6b
+		summarizeBy: none
+		sourceColumn: MonthlyPrice
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimPlan = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\mishi\Downloads\Customer_Churn_Analytics_Data.xlsx"), null, true),
+				    DimPlan_Sheet = Source{[Item="DimPlan",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(DimPlan_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"PlanID", type text}, {"PlanName", type text}, {"MonthlyPrice", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,424 @@
+table DimCustomer
+	lineageTag: 8bff1843-73e0-461f-b442-033659edfc0a
+
+	measure 'Total Customers' = DISTINCTCOUNT(dimCustomer[CustomerID])
+		formatString: 0
+		lineageTag: 9f445a97-ebb9-42c2-90fd-ffedb762bf06
+
+	measure 'Churned Customers' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(FactSubscription[CustomerID]),
+			    FactSubscription[Status] = "Churned"
+			)
+		formatString: 0
+		lineageTag: 6b31dab1-72bb-48d5-899b-b6c5b4201f3a
+
+	measure 'Churn Rate' =
+			
+			DIVIDE(
+			    [Churned Customers],
+			    [Total Customers],
+			    0
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: aca29483-f153-4f4e-876c-3a2706a89668
+
+	measure 'Total Revenue' = SUM(FactTransaction[Amount])
+		formatString: "₹"#,0;#,0\ -"₹";"₹"#,0
+		lineageTag: cc11f321-2766-4729-8df3-48d79807a772
+
+		annotation PBI_FormatHint = {"currencyCulture":"hi-IN"}
+
+	measure 'Churned Customers by Plan' =
+			
+			CALCULATE(
+			    [Churned Customers],
+			    USERELATIONSHIP(
+			        FactSubscription[PlanID],
+			        DimPlan[PlanID]
+			    )
+			)
+		formatString: 0
+		lineageTag: f5dec196-621a-4b29-8667-5be47cefb341
+
+	measure 'Cohort Customers' =
+			
+			DISTINCTCOUNT(FactTransaction[CustomerID])
+		formatString: 0
+		lineageTag: 6b479737-e63d-43a9-a771-e406cdfedf84
+
+	measure 'Cohort Size' =
+			
+			CALCULATE(
+			    [Cohort Customers],
+			    REMOVEFILTERS(FactTransaction[CohortPeriod]),
+			    FactTransaction[CohortPeriod] = 0
+			)
+		formatString: 0
+		lineageTag: e89640b2-d8fb-4a9f-90b8-ccc472c03f4f
+
+	measure 'Retention Rate' =
+			
+			DIVIDE(
+			    [Cohort Customers],
+			    [Cohort Size],
+			    0
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 19629ead-8591-489b-98d6-6dfa0931500a
+
+	measure 'Revenue MTD' =
+			
+			TOTALMTD(
+			    [Total Revenue],
+			    DimDate[Date]
+			)
+		lineageTag: a90bfd41-07c7-48d9-bc31-447ee96765d0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue YTD' =
+			
+			TOTALYTD(
+			    [Total Revenue],
+			    DimDate[Date]
+			)
+		lineageTag: 1a3c1fb6-71ce-499d-9545-9b001b8add1c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Rolling 12M Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATESINPERIOD(
+			        DimDate[Date],
+			        MAX(DimDate[Date]),
+			        -12,
+			        MONTH
+			    )
+			)
+		lineageTag: 2a34f03c-8edc-441c-858c-6cd9bf199f88
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Rolling 12M Churned Customers' =
+			
+			CALCULATE(
+			    [Churned Customers],
+			    DATESINPERIOD(
+			        DimDate[Date],
+			        MAX(DimDate[Date]),
+			        -12,
+			        MONTH
+			    )
+			)
+		formatString: 0
+		lineageTag: 9f7f503f-5e00-4b2a-9a67-0f9ff4298799
+
+	measure 'Rolling 12M Churn Rate' =
+			
+			VAR RollingChurn =
+			    CALCULATE(
+			        [Churned Customers],
+			        USERELATIONSHIP(
+			            DimDate[Date],
+			            FactSubscription[EndDate]
+			        ),
+			        DATESINPERIOD(
+			            DimDate[Date],
+			            MAX(DimDate[Date]),
+			            -12,
+			            MONTH
+			        )
+			    )
+			RETURN
+			DIVIDE(
+			    RollingChurn,
+			    [Total Customers],
+			    0
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 4ebbaf24-77c6-4c5f-8fd8-3f4fe4747f0c
+
+	measure 'Target Churn Rate' =
+			
+			1 - DIVIDE(
+			    [Target Retention Value],
+			    100
+			)
+		formatString: 0%;-0%;0%
+		lineageTag: 66f6ad8d-ceee-48c1-9085-e78d2a7c0af8
+
+	measure Measure
+		lineageTag: ca8d852c-9110-45f7-9b25-2f2351a12e68
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure 'Latest Month Revenue' =
+			
+			VAR LatestDate = MAXX(ALL(DimDate), DimDate[Date])
+			RETURN
+			CALCULATE(
+			    [Total Revenue],
+			    DATESBETWEEN(
+			        DimDate[Date],
+			        DATE(YEAR(LatestDate), MONTH(LatestDate), 1),
+			        LatestDate
+			    )
+			)
+		lineageTag: 093d48bc-9ab7-46e1-b656-6a1d0c2db4b2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Latest YTD Revenue' =
+			
+			VAR LatestDate = MAXX(ALL(DimDate), DimDate[Date])
+			RETURN
+			CALCULATE(
+			    [Total Revenue],
+			    DATESBETWEEN(
+			        DimDate[Date],
+			        DATE(YEAR(LatestDate), 1, 1),
+			        LatestDate
+			    )
+			)
+		lineageTag: b54d3bbb-ba67-411a-9705-6f977ad8a123
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Latest Rolling 12M Revenue' =
+			
+			VAR LatestDate = MAXX(ALL(DimDate), DimDate[Date])
+			RETURN
+			CALCULATE(
+			    [Total Revenue],
+			    DATESINPERIOD(
+			        DimDate[Date],
+			        LatestDate,
+			        -12,
+			        MONTH
+			    )
+			)
+		lineageTag: e62a7ad9-890f-4bf9-8741-a82bcf9bc126
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CustomerID
+		dataType: string
+		lineageTag: 5b1edcb3-b44e-46b8-886b-22a34f4813e6
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerName
+		dataType: string
+		lineageTag: a0390688-4089-49f6-ac70-5b6a267777e3
+		summarizeBy: none
+		sourceColumn: CustomerName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 03773360-0d88-4ff3-9289-9f020b39f044
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: 55f1e7d5-7781-45a3-888c-890bb1aacbf1
+		summarizeBy: sum
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: f4e6924d-21a6-4599-ad08-05930d5da0c7
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column SignupDate
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e432e5e-5f58-4229-883f-8a3b2a74335a
+		summarizeBy: sum
+		sourceColumn: SignupDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column CohortMonth =
+			
+			DATE(
+			    YEAR(DimCustomer[SignupDate]),
+			    MONTH(DimCustomer[SignupDate]),
+			    1
+			)
+		formatString: dd/mm/yyyy
+		lineageTag: ca5753f5-7e13-4188-85e8-be3fdbc6c4a0
+		summarizeBy: none
+
+		variation Variation
+			isDefault
+			relationship: 2d5c1b5a-e6f3-402c-b655-877131bafbde
+			defaultHierarchy: LocalDateTable_52812354-85b8-484b-8d77-9cdd61aff970.'Date Hierarchy'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column LastPurchaseDate =
+			
+			CALCULATE(
+			    MAX(FactTransaction[TransactionDate]),
+			    RELATEDTABLE(FactTransaction)
+			)
+		dataType: dateTime
+		formatString: dd-mm-yyyy
+		lineageTag: f8fa67d7-38f6-4b26-8596-ab5084c418f6
+		summarizeBy: none
+
+		variation Variation
+			isDefault
+			relationship: 1e812ade-2fff-4994-99ff-9712e51dcf64
+			defaultHierarchy: LocalDateTable_0fa60958-e67b-4bd7-8b0a-9519667a4e12.'Date Hierarchy'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column RecencyDays =
+			
+			DATEDIFF(
+			    DimCustomer[LastPurchaseDate],
+			    DATE(2025, 12, 31),
+			    DAY
+			)
+		formatString: 0
+		lineageTag: 634ed734-cc0d-4065-b9c3-0ce428a54c21
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Frequency =
+			
+			CALCULATE(
+			    COUNTROWS(FactTransaction),
+			    RELATEDTABLE(FactTransaction)
+			)
+		formatString: 0
+		lineageTag: 31b69924-d48c-43f4-a7a4-7a23daef2fd7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Monetary =
+			
+			CALCULATE(
+			    SUM(FactTransaction[Amount]),
+			    RELATEDTABLE(FactTransaction)
+			)
+		lineageTag: 3c2eb900-cac3-47c2-8f3f-68b991771d59
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column RecencyScore =
+			
+			SWITCH(
+			    TRUE(),
+			    DimCustomer[RecencyDays] <= 30, 5,
+			    DimCustomer[RecencyDays] <= 90, 4,
+			    DimCustomer[RecencyDays] <= 180, 3,
+			    DimCustomer[RecencyDays] <= 365, 2,
+			    1
+			)
+		formatString: 0
+		lineageTag: 4b7ab127-33b7-440d-8b54-29f08c723391
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column FrequencyScore =
+			
+			SWITCH(
+			    TRUE(),
+			    DimCustomer[Frequency] >= 18, 5,
+			    DimCustomer[Frequency] >= 12, 4,
+			    DimCustomer[Frequency] >= 6, 3,
+			    DimCustomer[Frequency] >= 3, 2,
+			    1
+			)
+		formatString: 0
+		lineageTag: 81f1b20b-e4e1-4fdd-9f7d-ba0fa656b4d3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonetaryScore =
+			
+			SWITCH(
+			    TRUE(),
+			    DimCustomer[Monetary] >= 20000, 5,
+			    DimCustomer[Monetary] >= 12000, 4,
+			    DimCustomer[Monetary] >= 6000, 3,
+			    DimCustomer[Monetary] >= 3000, 2,
+			    1
+			)
+		formatString: 0
+		lineageTag: 5afda090-3622-46fd-8c9d-c4749fc41a14
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column RFMSegment =
+			
+			SWITCH(
+			    TRUE(),
+			    DimCustomer[RecencyScore] >= 4 &&
+			    DimCustomer[FrequencyScore] >= 4 &&
+			    DimCustomer[MonetaryScore] >= 4, "Champions",
+			
+			    DimCustomer[RecencyScore] >= 4 &&
+			    DimCustomer[FrequencyScore] >= 3, "Loyal Customers",
+			
+			    DimCustomer[RecencyScore] <= 2, "At Risk / Lost",
+			
+			    "Potential Loyal"
+			)
+		lineageTag: 24779527-dfa6-4acd-8d5f-13406c074f05
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCustomer = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\mishi\Downloads\Customer_Churn_Analytics_Data.xlsx"), null, true),
+				    DimCustomer_Sheet = Source{[Item="DimCustomer",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(DimCustomer_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"CustomerID", type text}, {"CustomerName", type text}, {"Gender", type text}, {"Age", Int64.Type}, {"City", type text}, {"SignupDate", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,75 @@
+table FactSubscription
+	lineageTag: 6f2c42df-8bdb-4702-ad2e-61354f2aa8c2
+
+	column SubscriptionID
+		dataType: string
+		lineageTag: 01ca52a2-efa5-424a-aa35-cb768c2aca95
+		summarizeBy: none
+		sourceColumn: SubscriptionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: string
+		lineageTag: ee25cf8a-c547-458d-a49b-3522e060d4b5
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlanID
+		dataType: string
+		lineageTag: d2e9b1d4-99c0-4cdd-b2d3-25200879e381
+		summarizeBy: none
+		sourceColumn: PlanID
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: int64
+		formatString: 0
+		lineageTag: abccdfbb-9375-4e84-8182-53963f9415ef
+		summarizeBy: sum
+		sourceColumn: StartDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: int64
+		formatString: 0
+		lineageTag: e737a58f-5ad3-412f-a89c-096ca2514d58
+		summarizeBy: sum
+		sourceColumn: EndDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: ff6b818e-1017-4558-b55c-611570f69a4f
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthlyRevenue
+		dataType: int64
+		formatString: 0
+		lineageTag: 9105496a-3d94-4ce2-a8f0-1acc9ff73ec4
+		summarizeBy: sum
+		sourceColumn: MonthlyRevenue
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactSubscription = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\mishi\Downloads\Customer_Churn_Analytics_Data.xlsx"), null, true),
+				    FactSubscription_Sheet = Source{[Item="FactSubscription",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(FactSubscription_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SubscriptionID", type text}, {"CustomerID", type text}, {"PlanID", type text}, {"StartDate", Int64.Type}, {"EndDate", Int64.Type}, {"Status", type text}, {"MonthlyRevenue", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,28 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["DimCustomer","DimDate","DimPlan","FactTransaction","FactSubscription"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table DimCustomer
+ref table DimDate
+ref table DimPlan
+ref table FactTransaction
+ref table FactSubscription
+ref table DateTableTemplate_0ab22b38-197c-49b7-a225-b577fb473384
+ref table LocalDateTable_52812354-85b8-484b-8d77-9cdd61aff970
+ref table LocalDateTable_155a9103-0ce9-4d90-a8c8-edc62a415ccc
+ref table LocalDateTable_0fa60958-e67b-4bd7-8b0a-9519667a4e12
+ref table 'Target Retention'
+
+ref cultureInfo en-US
+

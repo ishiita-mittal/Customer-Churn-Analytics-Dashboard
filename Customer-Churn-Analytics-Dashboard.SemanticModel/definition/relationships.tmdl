@@ -1,0 +1,43 @@
+relationship AutoDetected_3dee60da-64dd-44fc-9275-95fffdee0a93
+	fromColumn: FactTransaction.CustomerID
+	toColumn: DimCustomer.CustomerID
+
+relationship AutoDetected_45edfa9d-2c66-4e93-908b-296423d150ec
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: FactSubscription.CustomerID
+	toColumn: DimCustomer.CustomerID
+
+relationship AutoDetected_61f6bfe1-671a-4e29-8485-89fa051c78cc
+	fromColumn: FactTransaction.PlanID
+	toColumn: DimPlan.PlanID
+
+relationship AutoDetected_04e39c7d-7ef2-4594-8c7d-a87c3fab3701
+	isActive: false
+	fromColumn: FactSubscription.PlanID
+	toColumn: DimPlan.PlanID
+
+relationship fda45e4f-6358-854e-3958-907a9967bb57
+	fromColumn: FactTransaction.TransactionDate
+	toColumn: DimDate.Date
+
+relationship 2d5c1b5a-e6f3-402c-b655-877131bafbde
+	joinOnDateBehavior: datePartOnly
+	fromColumn: DimCustomer.CohortMonth
+	toColumn: LocalDateTable_52812354-85b8-484b-8d77-9cdd61aff970.Date
+
+relationship 8a53ce23-ad42-4db8-9583-6f7b0b480b97
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactTransaction.TransactionMonth
+	toColumn: LocalDateTable_155a9103-0ce9-4d90-a8c8-edc62a415ccc.Date
+
+relationship 1e812ade-2fff-4994-99ff-9712e51dcf64
+	joinOnDateBehavior: datePartOnly
+	fromColumn: DimCustomer.LastPurchaseDate
+	toColumn: LocalDateTable_0fa60958-e67b-4bd7-8b0a-9519667a4e12.Date
+
+relationship 52bf2186-7ba4-4f1b-6761-2ad98e5273ff
+	isActive: false
+	fromColumn: FactSubscription.EndDate
+	toColumn: DimDate.Date
+

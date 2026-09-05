@@ -1,0 +1,100 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 205.88680569595564,
+            "y": -50
+          },
+          "nodeIndex": "DimCustomer",
+          "nodeLineageTag": "8bff1843-73e0-461f-b442-033659edfc0a",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 724.06964038210742,
+            "y": 207.37620088245615
+          },
+          "nodeIndex": "DimDate",
+          "nodeLineageTag": "6dafee03-1a4d-48c6-b67c-7b3bbcc3f626",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 334.16675829702905,
+            "y": 436.75240176491229
+          },
+          "nodeIndex": "DimPlan",
+          "nodeLineageTag": "ee115b62-1424-4f69-ac43-027f244055f7",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 224.17729372254934
+          },
+          "nodeIndex": "FactSubscription",
+          "nodeLineageTag": "6f2c42df-8bdb-4702-ad2e-61354f2aa8c2",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 490.06964038210742,
+            "y": 100.39184813885856
+          },
+          "nodeIndex": "FactTransaction",
+          "nodeLineageTag": "66665f0f-9e0f-4d7f-bb22-98c2042ac62e",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 958.06964038210742,
+            "y": 207.37620088245615
+          },
+          "nodeIndex": "Target Retention",
+          "nodeLineageTag": "1b995bc8-c406-4965-a02d-f7ed5b9e2166",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

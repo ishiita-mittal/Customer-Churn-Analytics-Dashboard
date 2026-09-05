@@ -1,0 +1,104 @@
+table FactTransaction
+	lineageTag: 66665f0f-9e0f-4d7f-bb22-98c2042ac62e
+
+	column TransactionID
+		dataType: string
+		lineageTag: 654add0c-393e-4bda-9eee-908866f6da22
+		summarizeBy: none
+		sourceColumn: TransactionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: string
+		lineageTag: 4e5cf6a7-a3ef-4d31-a22d-054922c99731
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlanID
+		dataType: string
+		lineageTag: fda75f35-0242-4384-93f1-e5a501c5376d
+		summarizeBy: none
+		sourceColumn: PlanID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TransactionDate
+		dataType: int64
+		formatString: 0
+		lineageTag: fafb70db-6753-45a1-a348-2815e19782c2
+		summarizeBy: none
+		sourceColumn: TransactionDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: double
+		lineageTag: de626d1f-3675-430c-ad6e-769b2944de41
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TransactionType
+		dataType: string
+		lineageTag: 4d271269-d471-4795-b8a1-4a6a87942cb9
+		summarizeBy: none
+		sourceColumn: TransactionType
+
+		annotation SummarizationSetBy = Automatic
+
+	column TransactionMonth =
+			
+			DATE(
+			    YEAR(FactTransaction[TransactionDate]),
+			    MONTH(FactTransaction[TransactionDate]),
+			    1
+			)
+		formatString: dd-mm-yyyy
+		lineageTag: 92802670-d4aa-4f72-9ebc-93b6deb8dc55
+		summarizeBy: none
+
+		variation Variation
+			isDefault
+			relationship: 8a53ce23-ad42-4db8-9583-6f7b0b480b97
+			defaultHierarchy: LocalDateTable_155a9103-0ce9-4d90-a8c8-edc62a415ccc.'Date Hierarchy'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column CohortPeriod =
+			
+			DATEDIFF(
+			    RELATED(DimCustomer[CohortMonth]),
+			    FactTransaction[TransactionMonth],
+			    MONTH
+			)
+		formatString: 0
+		lineageTag: 02e81027-a27a-457f-b137-007fc1c4d860
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactTransaction = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\mishi\Downloads\Customer_Churn_Analytics_Data.xlsx"), null, true),
+				    FactTransaction_Sheet = Source{[Item="FactTransaction",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(FactTransaction_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"TransactionID", type text}, {"CustomerID", type text}, {"PlanID", type text}, {"TransactionDate", Int64.Type}, {"Amount", type number}, {"TransactionType", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
