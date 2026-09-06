@@ -14,11 +14,11 @@ churn patterns and prioritize retention activities.
 
 ## Dashboard Preview
 
-![Customer Churn Analytics Dashboard 1](Screenshots/dashboard%201.png)
+![Customer Churn Analytics Dashboard 1](Screenshots/dashboard 1.png)
 
-![Customer Churn Analytics Dashboard 2](Screenshots/dashboard%202.png)
+![Customer Churn Analytics Dashboard 2](Screenshots/dashboard 2.png)
 
-![Customer Churn Analytics Dashboard 3](Screenshots/dashboard%203.png)
+![Customer Churn Analytics Dashboard 3](Screenshots/dashboard 3.png)
 
 ---
 
